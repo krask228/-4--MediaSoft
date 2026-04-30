@@ -1,8 +1,3 @@
--- ================================
--- 1) Создание БД и таблиц
--- СУБД: MySQL 8+
--- ================================
-
 DROP DATABASE IF EXISTS tour_agency;
 CREATE DATABASE tour_agency CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE tour_agency;
@@ -60,10 +55,6 @@ CREATE TABLE payments (
         REFERENCES bookings(booking_id) ON DELETE CASCADE
 );
 
--- ================================
--- 2) Наполнение тестовыми данными
--- ================================
-
 INSERT INTO customers (full_name, email, phone, registered_at) VALUES
 ('Иван Петров', 'ivan.petrov@mail.com', '+79991112233', '2026-01-10'),
 ('Мария Соколова', 'm.sokolova@mail.com', '+79992223344', '2026-02-05'),
@@ -93,17 +84,10 @@ INSERT INTO payments (booking_id, payment_date, amount, method, payment_status) 
 (5, '2026-04-15', 78000.00, 'card', 'paid'),
 (6, '2026-04-16', 10000.00, 'cash', 'pending');
 
--- ==========================================================
--- 3) Запросы по заданию
--- ==========================================================
-
--- 3.1 Агрегатная функция: общая сумма успешных платежей
 SELECT SUM(amount) AS total_paid_amount
 FROM payments
 WHERE payment_status = 'paid';
 
--- 3.2 JOIN между тремя таблицами:
--- Клиент + тур + бронирование
 SELECT
     c.full_name,
     t.title AS tour_title,
@@ -114,7 +98,6 @@ JOIN customers c ON c.customer_id = b.customer_id
 JOIN tours t ON t.tour_id = b.tour_id
 ORDER BY c.full_name;
 
--- 3.3 GROUP BY: количество бронирований по каждому туру
 SELECT
     t.title AS tour_title,
     COUNT(b.booking_id) AS bookings_count
@@ -123,8 +106,6 @@ LEFT JOIN bookings b ON b.tour_id = t.tour_id
 GROUP BY t.title
 ORDER BY bookings_count DESC, t.title;
 
--- 3.4 Вложенный запрос:
--- Клиенты, чья сумма платежей выше среднего чека по всем платежам
 SELECT
     c.full_name,
     SUM(p.amount) AS customer_total_paid
@@ -137,8 +118,6 @@ HAVING SUM(p.amount) > (
 )
 ORDER BY customer_total_paid DESC;
 
--- 3.5 Условный оператор (CASE):
--- Категория бронирования по уровню оплаты
 SELECT
     b.booking_id,
     c.full_name,
